@@ -31,4 +31,4 @@ class Die:
         outcomes = np.random.choice(self._die_df.index, size=times, p=self._die_df['Weight'] / self._die_df['Weight'].sum())
     def show_state(self):
         # Return a copy of the private die data frame
-        return self._die_df.copy())
+        return self._die_df.copy()
