@@ -20,8 +20,7 @@ class Die:
         if face not in self._die_df.index:
             raise IndexError("Face not found in the die.")
         # Check if the new weight is numeric
-        if not np.isscalar(new_weight):
-            raise TypeError("Weight must be a numeric value.")
+        assert isinstance(new_weight, (int, float)), "Weight must be a numeric value."
         # Update the weight
         self._die_df.loc[face, 'Weight'] = new_weight
     def roll(self, times=1):
