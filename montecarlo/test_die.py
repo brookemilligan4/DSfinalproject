@@ -4,14 +4,13 @@ import pandas as pd
 from die import Die
 
 class TestDie(unittest.TestCase):
-
     def setUp(self):
         self.faces = np.array([1, 2, 3, 4, 5, 6])
         self.die = Die(self.faces)
 
     def test_initialization(self):
         with self.assertRaises(TypeError):
-            Die([1, 2, 3])  # List instead of Numpy array
+            Die([1, 2, 3])  # List instead of NumPy array
         with self.assertRaises(ValueError):
             Die(np.array([1, 2, 2]))  # Duplicate faces
         self.assertIsInstance(self.die, Die)
@@ -37,3 +36,4 @@ class TestDie(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
