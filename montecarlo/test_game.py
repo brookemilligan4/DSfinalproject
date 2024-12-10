@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from game import Game, Die 
+from .game import Game, Die 
 
 class TestGame(unittest.TestCase):
     def setUp(self):
