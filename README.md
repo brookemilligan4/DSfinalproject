@@ -9,56 +9,34 @@ License: MIT License
 
 Description: Final project for DS 5100
 
-import numpy as np
-from dice_module import Die
+## Synopsis
+This project includes the following classes:
 
-faces = np.array([1, 2, 3, 4, 5, 6])
-die = Die(faces)
-roll_result = die.roll()  # Assuming you have a roll method
+1. **Die**: Represents a single die with customizable faces and weights.
+2. **Game**: Manages multiple dice and facilitates gameplay.
+3. **Analyzer**: Analyzes the results of the game, providing insights such as jackpots, face counts, combinations, and permutations.
 
-from dice_module import Game
+## API
 
-dice = [Die(faces), Die(faces), Die(faces)]
-game = Game(dice)
-game.play(5)  # Roll the dice 5 times
+### Classes
 
-from dice_module import Analyzer
+- **Die**
+  - **Methods**:
+    - `__init__(faces: np.ndarray)`: Initializes the die with specified faces.
+    - `change_weight(face: int, weight: float)`: Changes the weight of a specific face.
+    - `show()`: Displays the current faces and their weights.
+    - `roll(n: int)`: Rolls the die `n` times and returns the results.
 
-analyzer = Analyzer(game)
-### API
-This section lists all classes and their methods.
+- **Game**
+  - **Methods**:
+    - `__init__(dice: List[Die])`: Initializes the game with a list of dice.
+    - `play(n: int)`: Plays the game for `n` rounds.
+    - `show(format: str = 'wide')`: Displays the results of the game in specified format (wide/narrow).
 
-#### Class: Die
-- **Constructor**: `Die(faces: np.ndarray)`
-  - Initializes a Die object with a specified set of faces.
-  - Raises `TypeError` if `faces` is not a NumPy array.
-  - Raises `ValueError` if `faces` does not contain distinct values.
-
-- **Method**: `roll()`
-  - (Assumed) Returns a random face from the die.
-
-#### Class: Game
-- **Constructor**: `Game(dice: list)`
-  - Initializes a Game object with a list of Die objects.
-  - Raises `ValueError` if `dice` is not a list of at least two Die objects or if the dice do not have the same number of faces.
-
-- **Method**: `play(rolls: int)`
-  - Rolls the dice a specified number of times.
-
-- **Method**: `show_results()`
-  - (Assumed) Returns the results of the dice rolls conducted during the game.
-
-#### Class: Analyzer
-- **Constructor**: `Analyzer(game: Game)`
-  - Initializes an Analyzer object with a Game object.
-  - Raises `ValueError` if the provided `game` parameter is not an instance of the Game class.
-
-- **Method**: (Detail further methods as needed)
-  - (Assumed) Analyze the results stored in `self.results`.
-
-#### Class: TestAnalyzer
-- **Method**: `setUp()`
-  - Prepares the test environment by creating Die and Game objects and invoking the play method.
-
-- **Method**: `test_initialization_with_invalid_game()`
-  - Tests the initialization of the Analyzer with an invalid input, ensuring a `ValueError` is raised.
+- **Analyzer**
+  - **Methods**:
+    - `__init__(game: Game)`: Initializes the analyzer with a game instance.
+    - `jackpot()`: Returns the total number of jackpots.
+    - `face_counts_per_roll()`: Returns a DataFrame with face counts for each roll.
+    - `combo()`: Returns a DataFrame of combinations rolled.
+    - `permutation()`: Returns a DataFrame of permutations rolled.   
