@@ -12,9 +12,9 @@ Description: Final project for DS 5100
  Synopsis
 This project includes the following classes:
 
-1. **Die**: Represents a single die with customizable faces and weights.
-2. **Game**: Manages multiple dice and facilitates gameplay.
-3. **Analyzer**: Analyzes the results of the game, providing insights such as jackpots, face counts, combinations, and permutations.
+1. Die: Represents a single die with customizable faces and weights.
+2. Game: Manages multiple dice and facilitates gameplay.
+3. Analyzer: Analyzes the results of the game, providing insights such as jackpots, face counts, combinations, and permutations.
 
  API
 
