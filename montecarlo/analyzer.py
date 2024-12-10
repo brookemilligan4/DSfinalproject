@@ -1,80 +1,66 @@
-import pandas as pd
-from collections import Counter
-from itertools import permutations
-from .game import Game
-
 class Analyzer:
+    """
+    Analyze the results of a game, providing statistical insights.
+    """
+    
     def __init__(self, game):
         """
-        Initializes the Analyzer with the results of a Game object.
-
-        Parameters:
-        game (Game): An instance of the Game class containing the results to analyze.
-
+        Initialize analyzer with a game.
+        
+        Args:
+            game (Game): Game object to analyze
+        
         Raises:
-        ValueError: If the provided game parameter is not an instance of Game.
+            ValueError: If input is not a Game object
         """
         if not isinstance(game, Game):
-            raise ValueError("Input must be a Game object.")
+            raise ValueError("Input must be a Game object")
         
-        self.game = game
-        self.results = self.game.show_results()  # Store the game results for analysis
-
+        self._game = game
+        self._play_results = game.show()
+    
     def jackpot(self):
         """
-        Computes the number of jackpots in the game results.
-
-        A jackpot is defined as all faces rolled being the same in a given roll.
-
+        Count number of rolls where all dice show the same face.
+        
         Returns:
-        int: The number of jackpots found in the game results.
+            int: Number of jackpots
         """
-        jackpot_count = 0
-        for roll in self.results.itertuples(index=False):
-            if len(set(roll)) == 1:  # Check if all rolled faces are the same
-                jackpot_count += 1
-        return jackpot_count
-
-    def face_counts_per_roll(self, face):
+        return ((self._play_results.apply(lambda x: len(set(x)) == 1, axis=1)).sum())
+    
+    def face_counts_per_roll(self):
         """
-        Computes how many times a given face is rolled in each event.
-
-        Parameters:
-        face (str): The face value to count (must be in the set of faces).
-
+        Count occurrences of each face in each roll.
+        
         Returns:
-        pd.DataFrame: A DataFrame with an index of roll number and counts for the specified face.
+            pandas.DataFrame: Face counts per roll
         """
-        if face not in self.results.columns:
-            raise ValueError(f"Face '{face}' is not a valid face.")
-
-        counts = self.results.apply(lambda x: (x == face).sum(), axis=1)
-        return pd.DataFrame({'Roll Number': self.results.index, face: counts})
-
-    def combo_count(self):
+        unique_faces = set(self._play_results.values.ravel())
+        counts_df = pd.DataFrame(index=self._play_results.index)
+        
+        for face in unique_faces:
+            counts_df[face] = (self._play_results == face).sum(axis=1)
+        
+        return counts_df
+    
+    def combo(self):
         """
-        Computes the distinct combinations of faces rolled, along with their counts.
-
+        Count distinct combinations of faces rolled.
+        
         Returns:
-        pd.DataFrame: A DataFrame with a MultiIndex of distinct combinations and their associated counts.
+            pandas.DataFrame: Combination counts
         """
-        combos = [tuple(sorted(roll)) for roll in self.results.itertuples(index=False)]
-        combo_counts = Counter(combos)
-        combo_df = pd.Series(combo_counts).reset_index(name='Count').rename(columns={'index': 'Combination'})
-        return combo_df.set_index('Combination')
-
-    def permutation_count(self):
+        combos = [tuple(sorted(roll)) for roll in self._play_results.values]
+        combo_counts = pd.Series(combos).value_counts()
+        return pd.DataFrame(combo_counts).rename(columns={0: 'count'})
+    
+    def permutation(self):
         """
-        Computes the distinct permutations of faces rolled, along with their counts.
-
+        Count distinct permutations of faces rolled.
+        
         Returns:
-        pd.DataFrame: A DataFrame with a MultiIndex of distinct permutations and their associated counts.
+            pandas.DataFrame: Permutation counts
         """
-        perms = []
-        for roll in self.results.itertuples(index=False):
-            perms.extend(permutations(roll))  # Generate all permutations for the roll
-
-        perm_counts = Counter(perms)
-        perm_df = pd.DataFrame.from_dict(perm_counts, orient='index', columns=['Count'])
-        perm_df.index.names = ['Permutation']
-        return perm_df
+        perms = [tuple(roll) for roll in self._play_results.values]
+        perm_counts = pd.Series(perms).value_counts()
+        return pd.DataFrame(perm_counts).rename(columns={0: 'count'})

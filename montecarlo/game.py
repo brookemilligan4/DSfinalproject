@@ -1,41 +1,71 @@
-import random
-import pandas as pd
-
-class Die:
-    def __init__(self, faces):
-        if faces < 1:
-            raise ValueError("Die must have at least one face.")
-        self.faces = faces
-
-    def roll(self):
-        return random.randint(1, self.faces)
-
 class Game:
+    """
+    A game consisting of rolling multiple similar dice.
+    """
+    
     def __init__(self, dice):
-        if not isinstance(dice, list) or len(dice) < 2:
-            raise ValueError("Dice must be a list with at least two Die objects.")  # Change TypeError to ValueError
-        if len(set(die.faces for die in dice)) != 1:
-            raise ValueError("All dice must have the same number of faces.")
-        self.dice = dice
-        self.results = []
+        """
+        Initialize a game with given dice.
+        
+        Args:
+            dice (list): List of Die objects
+            
+        Raises:
+            ValueError: If no dice are provided
 
-    def play(self, rolls):
-        if rolls < 1:
-            raise ValueError("Rolls must be at least 1.")
-        self.results = []
-        for _ in range(rolls):
-            roll_result = [die.roll() for die in self.dice]  # Correctly call roll() without additional arguments
-            self.results.append(roll_result)
+        """
 
-    def show_results(self):
-        return pd.DataFrame(self.results, columns=[f'Die {i+1}' for i in range(len(self.dice))])
-
-    def get_results(self, form):
+        if not dice:
+            raise ValueError("At least one die must be provided.")
+        self._dice = dice
+        self._play_df = None
+    
+    def play(self, times):
+        """
+        Play the game by rolling all dice multiple times.
+        
+        Args:
+            times (int): Number of times to roll the dice
+        """
+        rolls = []
+        for roll_num in range(times):
+            roll_results = [die.roll(1)[0] for die in self._dice]
+            rolls.append(roll_results)
+        
+        self._play_df = pd.DataFrame(
+            rolls, 
+            columns=[f'Die_{i}' for i in range(len(self._dice))],
+            index=range(times)
+        )
+    
+    def show(self, form='wide'):
+        """
+        Show results of the most recent play.
+        
+        Args:
+            form (str): 'wide' or 'narrow' format, defaults to 'wide'
+        
+        Returns:
+            pandas.DataFrame: Game results
+        
+        Raises:
+            ValueError: If invalid form is provided
+        """
+        if form not in ['wide', 'narrow']:
+            raise ValueError("Form must be 'wide' or 'narrow'")
+        
+        if self._play_df is None:
+            raise ValueError("No game has been played yet")
+        
         if form == 'wide':
-            return self.show_results()
-        elif form == 'narrow':
-            narrow_df = self.show_results().melt(var_name='Die', value_name='Outcome')
-            return narrow_df
-        else:
-            raise ValueError("Invalid form. Use 'wide' or 'narrow'.")
+            return self._play_df.copy()
+        
+        # Convert to narrow form
+        narrow_df = self._play_df.melt(
+            var_name='Die', 
+            value_name='Face', 
+            ignore_index=False
+        ).reset_index()
+        narrow_df.set_index(['index', 'Die'], inplace=True)
+        return narrow_df
 

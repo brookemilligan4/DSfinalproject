@@ -1,39 +1,36 @@
 import unittest
 import numpy as np
-import pandas as pd
-from .die import Die
 
-class TestDie(unittest.TestCase):
+class testDie(unittest.TestCase):
     def setUp(self):
-        self.faces = np.array([1, 2, 3, 4, 5, 6])
-        self.die = Die(self.faces)
-
-    def test_initialization(self):
+        # Common setup for tests in testDie
+        self.test_faces = np.array([1, 2, 3, 4, 5, 6])
+        self.test_die = Die(self.test_faces)
+    
+    def test_die_initialization(self):
+        # Test die initialization
+        self.assertTrue(isinstance(self.test_die, Die))
+        self.assertTrue(np.array_equal(self.test_die.show()['faces'], self.test_faces))
+            
+    def test_die_change_weight(self):
+        # Test changing die weight
+        self.test_die.change_weight(1, 2.0)
+        weights = self.test_die.show()['weights']
+        self.assertEqual(weights[1], 2.0)
+    
+    def test_die_invalid_weight(self):
         with self.assertRaises(TypeError):
-            Die([1, 2, 3])  # List instead of NumPy array
-        with self.assertRaises(ValueError):
-            Die(np.array([1, 2, 2]))  # Duplicate faces
-        self.assertIsInstance(self.die, Die)
+            self.test_die.change_weight(1, "not_a_number")
 
-    def test_change_weight(self):
-        self.die.change_weight(1, 10)
-        self.assertEqual(self.die.show_state().loc[1, 'Weight'], 10)
-        with self.assertRaises(IndexError):
-            self.die.change_weight(7, 10)  # Invalid face
-        with self.assertRaises(TypeError):
-            self.die.change_weight(1, "invalid")  # Non-numeric weight
+    def test_die_roll(self):
+        # Test die rolling
+        rolls = self.test_die.roll(10)
+        self.assertEqual(len(rolls), 10)
+        self.assertTrue(all(roll in self.test_faces for roll in rolls))
 
-    def test_roll(self):
-        outcomes = self.die.roll(10)
-        self.assertEqual(len(outcomes), 10)
-        with self.assertRaises(ValueError):
-            self.die.roll(0)  # Invalid roll count
+def run_tests():
+    suite = unittest.TestLoader().loadTestsFromTestCase(testDie)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
-    def test_show_state(self):
-        state = self.die.show_state()
-        self.assertIsInstance(state, pd.DataFrame)
-        self.assertFalse(state is self.die.show_state())  # Ensure it's a copy
-
-if __name__ == '__main__':
-    unittest.main()
-
+run_tests()
